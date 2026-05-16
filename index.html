@@ -1,51 +1,128 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="it">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JUKEBOX</title>
+<title>Video Jukebox</title>
+
+<style>
+body {
+    margin: 0;
+    background: #0b0b0b;
+    font-family: Arial;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* CUORE */
+.heart {
+    width: 180px;
+    height: 160px;
+    position: relative;
+    margin-top: 40px;
+    transform: rotate(-45deg);
+    background: red;
+    box-shadow: 0 0 25px red;
+}
+
+.heart:before,
+.heart:after {
+    content: "";
+    width: 180px;
+    height: 160px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.heart:before { top: -90px; left: 0; }
+.heart:after { left: 90px; top: 0; }
+
+.player {
+    margin-top: 60px;
+    text-align: center;
+    width: 90%;
+}
+
+button {
+    background: red;
+    border: none;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 50px;
+    color: white;
+    font-size: 18px;
+}
+
+.controls {
+    margin-top: 20px;
+}
+</style>
 </head>
 
-<body style="margin:0;background:black;color:white;font-family:Arial;">
+<body>
 
-<div id="title" style="padding:10px;font-size:18px;"></div>
+<h2>❤️ VIDEO JUKEBOX</h2>
 
-<audio id="audio" controls autoplay style="width:100%;"></audio>
+<div class="heart"></div>
+
+<div class="player">
+    <h3 id="title">Caricamento...</h3>
+    <audio id="audio" controls autoplay></audio>
+
+    <div class="controls">
+        <button onclick="prev()">⏮</button>
+        <button onclick="play()">▶</button>
+        <button onclick="pause()">⏸</button>
+        <button onclick="next()">⏭</button>
+    </div>
+</div>
 
 <script>
-
 let playlist = [];
-let current = 0;
+let index = 0;
 
-async function loadPlaylist(){
+const audio = document.getElementById("audio");
+const title = document.getElementById("title");
 
-    const res = await fetch("playlist1.json");
-    playlist = await res.json();
+fetch("playlist1.json")
+.then(r => r.json())
+.then(data => {
+    playlist = data;
+    loadSong(0);
+});
 
-    playTrack(0);
-}
+function loadSong(i){
+    if(!playlist.length) return;
+    index = i;
 
-function playTrack(i){
-
-    if(i >= playlist.length) return;
-
-    current = i;
-
-    document.getElementById("title").innerText =
-        playlist[i].title;
-
-    const audio = document.getElementById("audio");
     audio.src = playlist[i].stream;
+    title.innerText = playlist[i].title;
 
     audio.play();
-
-    audio.onended = function(){
-        playTrack(current + 1);
-    }
 }
 
-loadPlaylist();
+function next(){
+    index++;
+    if(index >= playlist.length) index = 0;
+    loadSong(index);
+}
 
+function prev(){
+    index--;
+    if(index < 0) index = playlist.length - 1;
+    loadSong(index);
+}
+
+function play(){
+    audio.play();
+}
+
+function pause(){
+    audio.pause();
+}
 </script>
 
 </body>
