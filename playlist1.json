@@ -1,10 +1,14 @@
 [
   {
-    "title": "Canzone 1",
-    "stream": "URL_1"
+    "title": "La Nostra Relazione",
+    "stream": "https://raw.githubusercontent.com/videojukebox/jukebox/main/Vasco%20Rossi%20-%20La%20Nostra%20Relazione.mp3"
   },
   {
-    "title": "Canzone 2",
-    "stream": "URL_2"
+    "title": "Vivere",
+    "stream": "https://raw.githubusercontent.com/videojukebox/jukebox/main/Vasco%20Rossi%20-%20Vivere.mp3"
+  },
+  {
+    "title": "Canzone",
+    "stream": "https://raw.githubusercontent.com/videojukebox/jukebox/main/Vasco%20Rossi%20-%20canzone.mp3"
   }
 ]
