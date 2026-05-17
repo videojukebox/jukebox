@@ -3,126 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Video Jukebox</title>
+<title>Jukebox Player</title>
 
 <style>
 body {
     margin: 0;
     background: #0b0b0b;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* CUORE */
-.heart {
-    width: 180px;
-    height: 160px;
-    position: relative;
-    margin-top: 40px;
-    transform: rotate(-45deg);
-    background: red;
-    box-shadow: 0 0 25px red;
-}
-
-.heart:before,
-.heart:after {
-    content: "";
-    width: 180px;
-    height: 160px;
-    background: red;
-    border-radius: 50%;
-    position: absolute;
-}
-
-.heart:before { top: -90px; left: 0; }
-.heart:after { left: 90px; top: 0; }
-
-.player {
-    margin-top: 60px;
     text-align: center;
-    width: 90%;
 }
 
-button {
-    background: red;
-    border: none;
-    padding: 15px;
+h2 {
+    margin: 15px 0;
+    color: #ff2d55;
+}
+
+/* PLAYER */
+.player {
+    margin-top: 10px;
+}
+
+#title {
     margin: 10px;
-    border-radius: 50px;
-    color: white;
     font-size: 18px;
 }
 
-.controls {
-    margin-top: 20px;
+/* CONTROLLI */
+button {
+    background: #ff2d55;
+    border: none;
+    padding: 12px 18px;
+    margin: 5px;
+    border-radius: 30px;
+    color: white;
+    font-size: 16px;
+}
+
+/* LISTA */
+#list {
+    width: 92%;
+    margin: 20px auto;
+    text-align: left;
+}
+
+.item {
+    padding: 12px;
+    margin: 8px 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.item.active {
+    background: rgba(255,45,85,0.3);
+    border-left: 3px solid #ff2d55;
 }
 </style>
 </head>
 
 <body>
 
-<h2>❤️ VIDEO JUKEBOX</h2>
-
-<div class="heart"></div>
+<h2>❤️ JUKEBOX PLAYER</h2>
 
 <div class="player">
-    <h3 id="title">Caricamento...</h3>
-    <audio id="audio" controls autoplay></audio>
+    <div id="title">Caricamento playlist...</div>
 
-    <div class="controls">
+    <audio id="audio" controls></audio>
+
+    <div>
         <button onclick="prev()">⏮</button>
-        <button onclick="play()">▶</button>
-        <button onclick="pause()">⏸</button>
+        <button onclick="playAudio()">▶</button>
+        <button onclick="pauseAudio()">⏸</button>
         <button onclick="next()">⏭</button>
     </div>
 </div>
 
+<div id="list"></div>
+
 <script>
+
 let playlist = [];
 let index = 0;
+let userInteracted = false;
 
 const audio = document.getElementById("audio");
 const title = document.getElementById("title");
+const list = document.getElementById("list");
 
+/* Sblocca audio solo dopo interazione utente */
+document.addEventListener("click", () => {
+    userInteracted = true;
+}, { once: true });
+
+/* CARICA JSON */
 fetch("playlist1.json")
 .then(r => r.json())
 .then(data => {
     playlist = data;
+    renderList();
     loadSong(0);
 });
 
-function loadSong(i){
+/* CARICA BRANO */
+function loadSong(i) {
+
     if(!playlist.length) return;
+
     index = i;
 
     audio.src = playlist[i].stream;
     title.innerText = playlist[i].title;
 
-    audio.play();
+    if(userInteracted){
+        audio.play().catch(()=>{});
+    }
+
+    renderList();
 }
 
-function next(){
+/* NEXT */
+function next() {
     index++;
     if(index >= playlist.length) index = 0;
     loadSong(index);
 }
 
-function prev(){
+/* PREV */
+function prev() {
     index--;
     if(index < 0) index = playlist.length - 1;
     loadSong(index);
 }
 
-function play(){
+/* PLAY */
+function playAudio() {
+    userInteracted = true;
     audio.play();
 }
 
-function pause(){
+/* PAUSE */
+function pauseAudio() {
     audio.pause();
 }
+
+/* LISTA BRANI */
+function renderList() {
+
+    list.innerHTML = "";
+
+    for(let i=0;i<playlist.length;i++){
+
+        let div = document.createElement("div");
+        div.className = "item" + (i === index ? " active" : "");
+        div.innerText = "🎵 " + playlist[i].title;
+
+        div.onclick = () => loadSong(i);
+
+        list.appendChild(div);
+    }
+}
+
 </script>
 
 </body>
